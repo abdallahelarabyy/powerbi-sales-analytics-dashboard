@@ -4,6 +4,8 @@ An end-to-end sales analytics project on the **Wide World Importers** dataset: d
 
 **Scope:** 26,397 sales lines, Jan 2013 to May 2016, $19.9M sales, $9.9M profit.
 
+I also rebuilt the same analysis in code (pandas, FastAPI and React). See the [Python version](https://github.com/abdallahelarabyy/python-sales-analytics-dashboard). Both versions give the same totals to the cent.
+
 ![Executive Overview](docs/screenshots/1-overview.png)
 
 ## Skills demonstrated
