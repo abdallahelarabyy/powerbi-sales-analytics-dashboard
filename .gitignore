@@ -1,7 +1,7 @@
 # Only the Pro dashboard is published
-Power BI/
-Power BI Pro - backup (Excel source)/
-Screenshots/
+/Power BI/
+/Power BI Pro - backup (Excel source)/
+/Screenshots/
 
 # Power BI local/cache files
 **/.pbi/localSettings.json
