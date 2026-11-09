@@ -1,0 +1,166 @@
+table DimStockItem
+	lineageTag: fa529d0f-ece5-9839-4d68-08150c4b271a
+
+	column 'Stock Item Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: b4af7a5b-dd34-1cfe-5ec6-9b576e21aca5
+		summarizeBy: none
+		sourceColumn: Stock Item Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'WWI Stock Item ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4bed02f2-d60e-d907-0e08-15c43690ec5f
+		summarizeBy: none
+		sourceColumn: WWI Stock Item ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stock Item'
+		dataType: string
+		lineageTag: bdb72a98-f225-2153-e9f3-9b0706f62b01
+		summarizeBy: none
+		sourceColumn: Stock Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Category'
+		dataType: string
+		lineageTag: 6824ab2a-effb-3040-070c-abb3a180c866
+		summarizeBy: none
+		sourceColumn: Product Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: e4635f60-2f8b-7ff1-f41e-e871b0cda708
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column Size
+		dataType: string
+		lineageTag: 0a19d17a-5aa3-b164-e47b-b17334bac022
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column Brand
+		dataType: string
+		lineageTag: 63eb1ece-6262-b14f-0ef6-863cc395248f
+		summarizeBy: none
+		sourceColumn: Brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Selling Package'
+		dataType: string
+		lineageTag: ad7be026-5e80-1c5a-d81c-9ab7dc157a4a
+		summarizeBy: none
+		sourceColumn: Selling Package
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Buying Package'
+		dataType: string
+		lineageTag: 42c80674-8524-b660-4be5-192109983cda
+		summarizeBy: none
+		sourceColumn: Buying Package
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Chiller Stock'
+		dataType: string
+		lineageTag: 93f59e36-00f6-3486-bb37-0faccc09213c
+		summarizeBy: none
+		sourceColumn: Is Chiller Stock
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: 039540c2-d422-34b2-88e8-ae73fef77a77
+		summarizeBy: none
+		sourceColumn: Lead Time Days
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quantity Per Outer'
+		dataType: int64
+		formatString: 0
+		lineageTag: 233f2cb5-e5a7-f323-b759-f18b456d5161
+		summarizeBy: none
+		sourceColumn: Quantity Per Outer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Price'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: a8f7e002-9897-ca81-5b2e-be4c72da6f46
+		summarizeBy: none
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Recommended Retail Price'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: e1e18c8b-72ba-b168-ac74-97dee8605c32
+		summarizeBy: none
+		sourceColumn: Recommended Retail Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Typical Weight Per Unit'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: bc067717-9340-a94e-7fc0-36ca695e66cd
+		summarizeBy: none
+		sourceColumn: Typical Weight Per Unit
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimStockItem = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimStockItem.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Removed Junk First Row" = Table.Skip(Source, 1),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Junk First Row", [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"Stock Item Key", Int64.Type}, {"WWI Stock Item ID", Int64.Type}, {"Stock Item", type text}, {"Color", type text}, {"Selling Package", type text}, {"Buying Package", type text}, {"Brand", type text}, {"Size", type text}, {"Lead Time Days", Int64.Type}, {"Quantity Per Outer", Int64.Type}, {"Is Chiller Stock", Int64.Type}, {"Unit Price", type number}, {"Recommended Retail Price", type text}, {"Typical Weight Per Unit", type number}}, "en-US"),
+				    #"Kept One Row Per Product" = Table.SelectRows(#"Changed Type", each [Stock Item Key] <= 227),
+				    #"Removed Broken Columns" = Table.RemoveColumns(#"Kept One Row Per Product", {"Tax Rate", "Barcode", "Photo", "Discount", "Valid From", "Valid To", "Lineage Key"}),
+				    #"Fixed Retail Price" = Table.TransformColumns(#"Removed Broken Columns", {{"Recommended Retail Price", each if _ = null or Text.Trim(_) = "? -" then null else Number.FromText(Text.Remove(_, {"?", " ", ","}), "en-US"), type number}}),
+				    #"Color N/A" = Table.ReplaceValue(#"Fixed Retail Price", "N/A", "No Color", Replacer.ReplaceValue, {"Color"}),
+				    #"Brand N/A" = Table.ReplaceValue(#"Color N/A", "N/A", "Unbranded", Replacer.ReplaceValue, {"Brand"}),
+				    #"Size N/A" = Table.ReplaceValue(#"Brand N/A", "N/A", "No Size", Replacer.ReplaceValue, {"Size"}),
+				    #"Package N/A" = Table.ReplaceValue(#"Size N/A", "N/A", "Unknown", Replacer.ReplaceValue, {"Selling Package", "Buying Package"}),
+				    #"Trimmed Product Names" = Table.TransformColumns(#"Package N/A", {{"Stock Item", CleanSpaces, type text}}),
+				    #"Chiller Yes No" = Table.TransformColumns(#"Trimmed Product Names", {{"Is Chiller Stock", each if _ = 1 then "Yes" else "No", type text}}),
+				    #"Added Product Category" = Table.AddColumn(#"Chiller Yes No", "Product Category", each
+				        let n = Text.Lower([Stock Item]) in
+				        if n = "unknown" then "Unknown"
+				        else if Text.StartsWith(n, "usb ") then "USB Novelties"
+				        else if Text.Contains(n, "joke mug") then "Novelty Mugs"
+				        else if Text.Contains(n, "chocolate") then "Confectionery"
+				        else if Text.Contains(n, "slippers") or Text.Contains(n, "socks") then "Slippers & Socks"
+				        else if Text.Contains(n, "mask") then "Halloween Masks"
+				        else if Text.Contains(n, "hoodie") or Text.Contains(n, "jacket") or Text.Contains(n, "t-shirt") then "Clothing"
+				        else if Text.StartsWith(n, "rc ") or Text.StartsWith(n, "ride on") or Text.Contains(n, "action figures") then "Toys"
+				        else if Text.Contains(n, "periscope") then "Novelty Gadgets"
+				        else if Text.Contains(n, "blade") or Text.Contains(n, "marker") or Text.Contains(n, "knife") then "Office Supplies"
+				        else "Packaging Materials", type text),
+				    #"Kept Final Columns" = Table.SelectColumns(#"Added Product Category", {"Stock Item Key", "WWI Stock Item ID", "Stock Item", "Product Category", "Color", "Size", "Brand", "Selling Package", "Buying Package", "Is Chiller Stock", "Lead Time Days", "Quantity Per Outer", "Unit Price", "Recommended Retail Price", "Typical Weight Per Unit"})
+				in
+				    #"Kept Final Columns"
+
+	annotation PBI_ResultType = Table
+

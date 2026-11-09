@@ -1,0 +1,29 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "bm_overview_open"
+    },
+    {
+      "name": "bm_overview_close"
+    },
+    {
+      "name": "bm_trends_open"
+    },
+    {
+      "name": "bm_trends_close"
+    },
+    {
+      "name": "bm_products_open"
+    },
+    {
+      "name": "bm_products_close"
+    },
+    {
+      "name": "bm_customers_open"
+    },
+    {
+      "name": "bm_customers_close"
+    }
+  ]
+}

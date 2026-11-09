@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Trends - insights open",
+  "name": "bm_trends_open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "ffd003585810babf65c3",
+      "73c0c69685c264aef788",
+      "32fdcda96acc171b511e",
+      "9b23dbdaea8ae564eb69",
+      "2c8a5c68ac1cb7f42f20",
+      "8fbddcd6635e665079ad"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "3f10731fc4e4cb48eab4",
+    "sections": {
+      "3f10731fc4e4cb48eab4": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "ffd003585810babf65c3": {
+            "isHidden": false
+          }
+        }
+      }
+    }
+  }
+}

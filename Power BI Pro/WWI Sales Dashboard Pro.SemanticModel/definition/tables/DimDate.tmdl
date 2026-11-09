@@ -1,0 +1,201 @@
+table DimDate
+	lineageTag: ae565378-edb0-bacb-7e91-a4bfe871f164
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: bcee8b64-9d45-e0a2-1ebf-f20c8a440c8f
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: c8fa907d-f22b-3905-fa3d-28051ec4ae66
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 04de20e2-82fb-2c02-e4b5-b7c4cbdd5678
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Calendar Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Short Month'
+		dataType: string
+		lineageTag: 188caeed-db15-1654-cd4e-2cae5309fe18
+		summarizeBy: none
+		sourceColumn: Short Month
+		sortByColumn: 'Calendar Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calendar Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 17adacec-b824-48ef-2fe7-9a1e9bea8684
+		summarizeBy: none
+		sourceColumn: Calendar Month Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calendar Month Label'
+		dataType: string
+		lineageTag: 389c9f09-21ee-cd73-90b5-821e5848a74a
+		summarizeBy: none
+		sourceColumn: Calendar Month Label
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calendar Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: cc853a44-5a43-9ab8-f78e-99af1ada51bd
+		summarizeBy: none
+		sourceColumn: Calendar Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calendar Year Label'
+		dataType: string
+		lineageTag: aab1c03c-605a-d195-9495-483708c058fa
+		summarizeBy: none
+		sourceColumn: Calendar Year Label
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2d718cac-5880-7669-0fe4-06a7884de862
+		summarizeBy: none
+		sourceColumn: Fiscal Month Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Month Label'
+		dataType: string
+		lineageTag: fe7887f1-f84d-139f-0dd3-0f4427a53346
+		summarizeBy: none
+		sourceColumn: Fiscal Month Label
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0c513131-805f-ba02-40c7-e141f62cfdc8
+		summarizeBy: none
+		sourceColumn: Fiscal Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Year Label'
+		dataType: string
+		lineageTag: 89d6adaa-e9b3-3218-dab4-d2a347146f12
+		summarizeBy: none
+		sourceColumn: Fiscal Year Label
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ISO Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 395a884e-1969-5fa6-caa9-ee577d77ff02
+		summarizeBy: none
+		sourceColumn: ISO Week Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 57122775-5d1a-53a1-4b9e-746fbda912c0
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Quarter'
+		dataType: string
+		lineageTag: 3e102667-724d-2aa2-1ccb-ffaaec6b9150
+		summarizeBy: none
+		sourceColumn: Year Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: fc4d9da5-be90-e103-1860-16a7c884c51f
+		summarizeBy: none
+		sourceColumn: Month Year
+		sortByColumn: 'Month Year Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year Sort'
+		dataType: int64
+		formatString: 0
+		lineageTag: ca668ed3-d7d6-a5f3-8cd3-fde934b2c164
+		summarizeBy: none
+		sourceColumn: Month Year Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weekday
+		dataType: string
+		lineageTag: 08dbe078-d99a-8757-a5e4-6c0a094af5e9
+		summarizeBy: none
+		sourceColumn: Weekday
+		sortByColumn: 'Weekday Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Weekday Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0fa5af8f-513c-622c-6dd0-54d77226a7e8
+		summarizeBy: none
+		sourceColumn: Weekday Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: string
+		lineageTag: 75537564-d84e-67c0-56f6-498a7c0a74a6
+		summarizeBy: none
+		sourceColumn: Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimDate.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"Day Number", Int64.Type}, {"Day", Int64.Type}, {"Month", type text}, {"Short Month", type text}, {"Calendar Month Number", Int64.Type}, {"Calendar Month Label", type text}, {"Calendar Year", Int64.Type}, {"Calendar Year Label", type text}, {"Fiscal Month Number", Int64.Type}, {"Fiscal Month Label", type text}, {"Fiscal Year", Int64.Type}, {"Fiscal Year Label", type text}, {"ISO Week Number", Int64.Type}}, "en-US"),
+				    #"Removed Duplicate Day Number" = Table.RemoveColumns(#"Changed Type", {"Day Number"}),
+				    #"Added Missing 31 Dec 2016" = Table.InsertRows(#"Removed Duplicate Day Number", Table.RowCount(#"Removed Duplicate Day Number"), {[Date = #date(2016, 12, 31), Day = 31, Month = "December", #"Short Month" = "Dec", #"Calendar Month Number" = 12, #"Calendar Month Label" = "CY2016-Dec", #"Calendar Year" = 2016, #"Calendar Year Label" = "CY2016", #"Fiscal Month Number" = 2, #"Fiscal Month Label" = "FY2017-Dec", #"Fiscal Year" = 2017, #"Fiscal Year Label" = "FY2017", #"ISO Week Number" = 52]}),
+				    #"Added Quarter" = Table.AddColumn(#"Added Missing 31 Dec 2016", "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+				    #"Added Year Quarter" = Table.AddColumn(#"Added Quarter", "Year Quarter", each Text.From([Calendar Year]) & "-" & [Quarter], type text),
+				    #"Added Month Year" = Table.AddColumn(#"Added Year Quarter", "Month Year", each [Short Month] & " " & Text.From([Calendar Year]), type text),
+				    #"Added Month Year Sort" = Table.AddColumn(#"Added Month Year", "Month Year Sort", each [Calendar Year] * 100 + [Calendar Month Number], Int64.Type),
+				    #"Added Weekday" = Table.AddColumn(#"Added Month Year Sort", "Weekday", each Date.DayOfWeekName([Date], "en-US"), type text),
+				    #"Added Weekday Number" = Table.AddColumn(#"Added Weekday", "Weekday Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
+				    #"Added Is Weekend" = Table.AddColumn(#"Added Weekday Number", "Is Weekend", each if [Weekday Number] >= 6 then "Yes" else "No", type text)
+				in
+				    #"Added Is Weekend"
+
+	annotation PBI_ResultType = Table
+

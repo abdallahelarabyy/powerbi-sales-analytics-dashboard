@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Products - insights close",
+  "name": "bm_products_close",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "c347c1a11c1d68a6a4a4",
+      "40ce04c143134d78d708",
+      "84a71002957510ec28b5",
+      "e918cd761f5611db23d9",
+      "0e2d9f62ab1a1cce4a5e",
+      "3ed59a36c36a2b314df9"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "05a3399ae00fae62cf86",
+    "sections": {
+      "05a3399ae00fae62cf86": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "c347c1a11c1d68a6a4a4": {
+            "isHidden": true
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "WWI Sales Dashboard Pro"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c506846c-a7b6-98e7-b47f-be7bc453c6fb"
+  }
+}

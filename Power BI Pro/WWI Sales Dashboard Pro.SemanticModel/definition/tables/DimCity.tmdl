@@ -1,0 +1,97 @@
+table DimCity
+	lineageTag: 84d047f3-bf95-74f9-af5c-788085885c86
+
+	column 'City ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7f86ac8a-3b5d-13b9-99c4-bba88fafe8b3
+		summarizeBy: none
+		sourceColumn: City ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 8caea19f-2e8c-4f00-2959-01f8e5c0b48f
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: fc7d7f37-3019-c887-e77f-7893631bb651
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: f31521d6-393a-0081-61a2-53781e8e371c
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'City State'
+		dataType: string
+		lineageTag: 7db0a303-ef28-4f54-227e-156089f2e5ce
+		dataCategory: Place
+		summarizeBy: none
+		sourceColumn: City State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Population
+		dataType: int64
+		formatString: 0
+		lineageTag: aa0f9045-9c4f-4789-f163-41c7983cb757
+		summarizeBy: none
+		sourceColumn: Population
+
+		annotation SummarizationSetBy = Automatic
+
+	column Latitude
+		dataType: double
+		formatString: 0.000000
+		lineageTag: 330d3579-5607-68b1-ceaa-5f070e9edb20
+		dataCategory: Latitude
+		summarizeBy: none
+		sourceColumn: Latitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column Longitude
+		dataType: double
+		formatString: 0.000000
+		lineageTag: 63ee155f-66f0-e45c-694a-39ed083befb4
+		dataCategory: Longitude
+		summarizeBy: none
+		sourceColumn: Longitude
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCity = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimCity.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"City Key", Int64.Type}, {"City", type text}, {"State Province", type text}, {"Country", type text}, {"Sales Territory", type text}, {"Location", type text}, {"Latest Recorded Population", Int64.Type}}, "en-US"),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type", {{"City", Text.Trim, type text}, {"State Province", Text.Trim, type text}, {"Country", Text.Trim, type text}}),
+				    #"Zero Population To Blank" = Table.ReplaceValue(#"Trimmed Text", 0, null, Replacer.ReplaceValue, {"Latest Recorded Population"}),
+				    #"One Row Per City" = Table.Group(#"Zero Population To Blank", {"City", "State Province", "Country", "Location"}, {{"City ID", each List.Min([City Key]), Int64.Type}, {"Population", each List.Max([Latest Recorded Population]), Int64.Type}}),
+				    #"Added Latitude" = Table.AddColumn(#"One Row Per City", "Latitude", each BinaryFormat.ByteOrder(BinaryFormat.Double, ByteOrder.LittleEndian)(Binary.Range(Binary.FromText(Text.AfterDelimiter([Location], "0x"), BinaryEncoding.Hex), 6, 8)), type number),
+				    #"Added Longitude" = Table.AddColumn(#"Added Latitude", "Longitude", each BinaryFormat.ByteOrder(BinaryFormat.Double, ByteOrder.LittleEndian)(Binary.Range(Binary.FromText(Text.AfterDelimiter([Location], "0x"), BinaryEncoding.Hex), 14, 8)), type number),
+				    #"Added City State" = Table.AddColumn(#"Added Longitude", "City State", each [City] & ", " & [State Province], type text),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added City State", {{"State Province", "State"}}),
+				    #"Kept Final Columns" = Table.SelectColumns(#"Renamed Columns", {"City ID", "City", "State", "Country", "City State", "Population", "Latitude", "Longitude"})
+				in
+				    #"Kept Final Columns"
+
+	annotation PBI_ResultType = Table
+

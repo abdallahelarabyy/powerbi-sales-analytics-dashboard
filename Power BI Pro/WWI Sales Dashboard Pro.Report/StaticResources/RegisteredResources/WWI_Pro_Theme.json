@@ -1,0 +1,146 @@
+{
+  "name": "WWI Pro",
+  "dataColors": [
+    "#1F6FB2",
+    "#17A2B8",
+    "#F0A202",
+    "#7B61FF",
+    "#1A7F64",
+    "#D64545",
+    "#5B6B7F",
+    "#9DB7D5",
+    "#E07A5F",
+    "#3D405B"
+  ],
+  "foreground": "#1B2A41",
+  "foregroundNeutralSecondary": "#6B7A90",
+  "foregroundNeutralTertiary": "#A0AEC0",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F7F9FC",
+  "backgroundNeutral": "#DDE3EB",
+  "tableAccent": "#1F6FB2",
+  "good": "#1A7F64",
+  "neutral": "#F0A202",
+  "bad": "#D64545",
+  "maximum": "#1F6FB2",
+  "center": "#F0A202",
+  "minimum": "#DCE9F7",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 24,
+      "color": "#1B2A41"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#1B2A41"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#1B2A41"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#6B7A90"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#DDE3EB"
+              }
+            },
+            "radius": 10
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": true,
+            "preset": "Custom",
+            "color": {
+              "solid": {
+                "color": "#0B1F3A"
+              }
+            },
+            "transparency": 88,
+            "shadowBlur": 14,
+            "shadowDistance": 3,
+            "shadowSpread": 0,
+            "angle": 90,
+            "position": "Outer"
+          }
+        ],
+        "title": [
+          {
+            "show": true,
+            "fontColor": {
+              "solid": {
+                "color": "#1B2A41"
+              }
+            },
+            "fontSize": 12,
+            "bold": true
+          }
+        ],
+        "subTitle": [
+          {
+            "show": false
+          }
+        ],
+        "visualHeader": [
+          {
+            "show": true,
+            "foreground": {
+              "solid": {
+                "color": "#6B7A90"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#EEF2F7"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#EEF2F7"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

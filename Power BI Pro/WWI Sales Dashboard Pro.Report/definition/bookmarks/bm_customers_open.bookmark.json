@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Customers - insights open",
+  "name": "bm_customers_open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "44b02b619ef27d06a4ca",
+      "52d3074a3ebf5ee60ae2",
+      "fbe220b777e80ab067df",
+      "c8a251be7b782cee2012",
+      "390d7bedca3e61bdfd41",
+      "df45b440563b10accda7"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "ecbba4d9261d9a1dd3ee",
+    "sections": {
+      "ecbba4d9261d9a1dd3ee": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "44b02b619ef27d06a4ca": {
+            "isHidden": false
+          }
+        }
+      }
+    }
+  }
+}

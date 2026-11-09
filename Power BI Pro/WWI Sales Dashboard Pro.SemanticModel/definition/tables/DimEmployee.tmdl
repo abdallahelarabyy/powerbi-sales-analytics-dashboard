@@ -1,0 +1,55 @@
+table DimEmployee
+	lineageTag: f126ad0a-133c-6e87-d0a7-23d9ea6deab5
+
+	column 'Employee ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 012612c1-774d-d10b-d545-419507c13984
+		summarizeBy: none
+		sourceColumn: Employee ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee
+		dataType: string
+		lineageTag: 1c64695d-b969-dbb3-ad14-b0389734f5b4
+		summarizeBy: none
+		sourceColumn: Employee
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Preferred Name'
+		dataType: string
+		lineageTag: 2a2588a3-418f-2b42-edcf-e03bbdedffe2
+		summarizeBy: none
+		sourceColumn: Preferred Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Salesperson'
+		dataType: string
+		lineageTag: ef78c783-ed25-38b0-d810-2e0a55bb80fe
+		summarizeBy: none
+		sourceColumn: Is Salesperson
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimEmployee = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "DimEmployee.xlsx"), null, true),
+				    Sheet = Source{[Item = "DimEmployee", Kind = "Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    #"Removed Empty And System Columns" = Table.RemoveColumns(#"Promoted Headers", {"Photo", "Valid From", "Valid To", "Lineage Key", "Employee Key"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Empty And System Columns", {{"WWI Employee ID", Int64.Type}, {"Employee", type text}, {"Preferred Name", type text}, {"Is Salesperson", Int64.Type}}),
+				    #"One Row Per Person" = Table.Distinct(#"Changed Type", {"WWI Employee ID"}),
+				    #"Filled Unknown Name" = Table.ReplaceValue(#"One Row Per Person", "N/A", "Unknown", Replacer.ReplaceValue, {"Preferred Name"}),
+				    #"Salesperson Yes No" = Table.TransformColumns(#"Filled Unknown Name", {{"Is Salesperson", each if _ = 1 then "Yes" else "No", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Salesperson Yes No", {{"WWI Employee ID", "Employee ID"}}),
+				    #"Kept Final Columns" = Table.SelectColumns(#"Renamed Columns", {"Employee ID", "Employee", "Preferred Name", "Is Salesperson"})
+				in
+				    #"Kept Final Columns"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,116 @@
+table DimCustomer
+	lineageTag: e0a601d7-5fee-b49e-49c4-2e0bf7e53237
+
+	column 'Customer Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 161810f6-5235-a4e6-008b-f88000635616
+		summarizeBy: none
+		sourceColumn: Customer Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'WWI Customer ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 817b982b-a9af-c108-119c-ef4385990511
+		summarizeBy: none
+		sourceColumn: WWI Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer
+		dataType: string
+		lineageTag: 6ccc93fb-c2d3-4614-880b-a22941bece38
+		summarizeBy: none
+		sourceColumn: Customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Store City'
+		dataType: string
+		lineageTag: 165d4f71-3563-dd7c-ae25-484358fc1f81
+		summarizeBy: none
+		sourceColumn: Store City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Store State'
+		dataType: string
+		lineageTag: 1817d60b-2126-c964-c5ea-8646cb26420a
+		summarizeBy: none
+		sourceColumn: Store State
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bill To Customer'
+		dataType: string
+		lineageTag: c317a55b-3948-4c9b-0abc-6397825a2632
+		summarizeBy: none
+		sourceColumn: Bill To Customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Buying Group'
+		dataType: string
+		lineageTag: ce99b4f0-b559-8d13-9692-facfa7ba5161
+		summarizeBy: none
+		sourceColumn: Buying Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 976d6339-ccb6-400c-da83-db49b5f77594
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Primary Contact'
+		dataType: string
+		lineageTag: 6b98fc0c-e224-afe5-4a3e-d10c6cae5a4c
+		summarizeBy: none
+		sourceColumn: Primary Contact
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Postal Code'
+		dataType: string
+		lineageTag: 9be47b91-4aca-e876-2211-4578caac1fad
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Credit Limit'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 61d478fa-8005-5330-708f-5a236a522bcc
+		summarizeBy: none
+		sourceColumn: Credit Limit
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCustomer = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimCustomer.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Removed Junk Title Row" = Table.Skip(Source, 1),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Junk Title Row", [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"Customer Key", Int64.Type}, {"WWI Customer ID", Int64.Type}, {"Customer", type text}, {"Bill To Customer", type text}, {"Category", type text}, {"Buying Group", type text}, {"Primary Contact", type text}, {"Postal Code", type text}, {"Credit Limit", type text}}, "en-US"),
+				    #"Removed Broken Columns" = Table.RemoveColumns(#"Changed Type", {"Valid From", "Valid To", "Lineage Key"}),
+				    #"Fixed Credit Limit" = Table.TransformColumns(#"Removed Broken Columns", {{"Credit Limit", each if _ = null or Text.Trim(_) = "? -" then null else Number.FromText(Text.Remove(_, {"?", " ", ","}), "en-US"), type number}}),
+				    #"Repaired Contact Names" = Table.TransformColumns(#"Fixed Credit Limit", {{"Primary Contact", each Text.Replace(Text.Replace(Text.Replace(Text.Replace(_, "Ä#(0081)", "ā"), "Ä#(008D)", "č"), "Ä±", "ı"), "Åš", "Ś"), type text}}),
+				    #"Added Store City" = Table.AddColumn(#"Repaired Contact Names", "Store City", each if Text.Contains([Customer], ",") then Text.Trim(Text.BetweenDelimiters([Customer], "(", ",")) else null, type text),
+				    #"Added Store State" = Table.AddColumn(#"Added Store City", "Store State", each if Text.Contains([Customer], ",") then Text.Trim(Text.BetweenDelimiters([Customer], ", ", ")")) else null, type text),
+				    #"Unknown To Cash Sale" = Table.ReplaceValue(#"Added Store State", "Unknown", "Cash Sale", Replacer.ReplaceValue, {"Customer"}),
+				    #"Cash Sale Groups" = Table.ReplaceValue(#"Unknown To Cash Sale", "N/A", "Cash Sale", Replacer.ReplaceValue, {"Bill To Customer", "Buying Group", "Category"}),
+				    #"N/A To Blank" = Table.ReplaceValue(#"Cash Sale Groups", "N/A", null, Replacer.ReplaceValue, {"Primary Contact", "Postal Code"}),
+				    #"Kept Final Columns" = Table.SelectColumns(#"N/A To Blank", {"Customer Key", "WWI Customer ID", "Customer", "Store City", "Store State", "Bill To Customer", "Buying Group", "Category", "Primary Contact", "Postal Code", "Credit Limit"})
+				in
+				    #"Kept Final Columns"
+
+	annotation PBI_ResultType = Table
+

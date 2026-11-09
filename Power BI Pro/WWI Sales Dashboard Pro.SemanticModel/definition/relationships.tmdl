@@ -1,0 +1,30 @@
+relationship a2a1f79a-79ac-9336-5d64-7846681f15c6
+	fromColumn: FactSale.'Invoice Date'
+	toColumn: DimDate.Date
+
+relationship 56f08c4d-a008-a4c1-fd93-be976bdc4f7c
+	isActive: false
+	fromColumn: FactSale.'Delivery Date'
+	toColumn: DimDate.Date
+
+relationship 05708516-d8de-1816-ff32-6dcbebb2a293
+	fromColumn: FactSale.'City ID'
+	toColumn: DimCity.'City ID'
+
+relationship 78f443cb-eae8-9845-26e0-eec2c2b72af7
+	fromColumn: FactSale.'Customer Key'
+	toColumn: DimCustomer.'Customer Key'
+
+relationship eaf42c6a-062d-61d2-b0bf-cca395eb5a67
+	isActive: false
+	fromColumn: FactSale.'Bill To Customer Key'
+	toColumn: DimCustomer.'Customer Key'
+
+relationship 83e41063-c99a-6134-15f1-d77a0d2acb9e
+	fromColumn: FactSale.'Stock Item Key'
+	toColumn: DimStockItem.'Stock Item Key'
+
+relationship 20f0298b-c176-b30b-4bae-333840a989a0
+	fromColumn: FactSale.'Salesperson ID'
+	toColumn: DimEmployee.'Employee ID'
+

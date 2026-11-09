@@ -1,0 +1,17 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "2c905649a99a86b4f61c",
+  "position": {
+    "x": 860,
+    "y": 70,
+    "z": 9700,
+    "height": 640,
+    "width": 410,
+    "tabOrder": 2100
+  },
+  "visualGroup": {
+    "displayName": "Insights panel",
+    "groupMode": "ScaleMode"
+  },
+  "isHidden": true
+}

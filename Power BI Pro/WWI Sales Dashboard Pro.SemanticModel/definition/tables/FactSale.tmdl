@@ -1,0 +1,401 @@
+table FactSale
+	lineageTag: 89aac9ac-0fdd-c853-92f6-8af0a3007300
+
+	measure 'Margin Color' = SWITCH ( TRUE (), [Profit Margin] < 0, "#D64545", [Profit Margin] < 0.3, "#F0A202", "#1A7F64" )
+		displayFolder: Formatting
+		lineageTag: 5238e9c8-459b-367d-ce21-e06bfe77fc13
+
+	measure 'YoY Color' = IF ( [Sales YoY %] < 0, "#D64545", "#1A7F64" )
+		displayFolder: Formatting
+		lineageTag: a3e263cc-07d1-208a-58d6-8178b1224988
+
+	measure 'Margin Target' = 0.5
+		formatString: 0%
+		displayFolder: Targets
+		lineageTag: 1d75e7ca-9aa7-c051-da51-f747af7db5f9
+
+	measure 'Gauge Max' = 0.8
+		formatString: 0%
+		displayFolder: Targets
+		lineageTag: c5c9fe53-de70-f488-fee9-2828507fa05a
+
+	measure 'Profit per Invoice' = DIVIDE ( [Total Profit], [Invoices] )
+		formatString: \$#,0
+		displayFolder: Profit
+		lineageTag: 9437b767-787c-3ee8-2f74-93a4c4b39c6d
+
+	measure 'Total Sales' = SUM ( FactSale[Total Excluding Tax] )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: 57bda1f8-536b-e84a-6694-19d1a5feb1bd
+
+	measure 'Total Profit' = SUM ( FactSale[Profit] )
+		formatString: \$#,0
+		displayFolder: Profit
+		lineageTag: 8577e513-1dea-66d2-a112-424733fadc01
+
+	measure 'Profit Margin' = DIVIDE ( [Total Profit], [Total Sales] )
+		formatString: 0.0%
+		displayFolder: Profit
+		lineageTag: dd413034-6317-e062-fe27-0e9c15b8e6c4
+
+	measure 'Total Cost' = SUM ( FactSale[Cost] )
+		formatString: \$#,0
+		displayFolder: Profit
+		lineageTag: 22722a40-6284-9c98-fe51-94739d5f2b6e
+
+	measure 'Total Tax' = SUM ( FactSale[Tax Amount] )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: 0b79bbf9-77a2-3610-1db7-83fd8b750bc2
+
+	measure Invoices = DISTINCTCOUNT ( FactSale[WWI Invoice ID] )
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: 87564a3c-3290-2b1f-2b99-67ad097600a9
+
+	measure 'Units Sold' = SUM ( FactSale[Quantity] )
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: 9a594e65-d0b3-10d7-fd79-1805d272e6df
+
+	measure 'Avg Invoice Value' = DIVIDE ( [Total Sales], [Invoices] )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: 245e59bb-0986-6994-b263-fabdd81d4bdd
+
+	measure 'Active Customers' = CALCULATE ( DISTINCTCOUNT ( FactSale[Customer Key] ), FactSale[Customer Key] <> 0 )
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 9a12ca92-b97d-010c-5f58-e5fce8851b33
+
+	measure 'Cash Sales %' = DIVIDE ( CALCULATE ( [Total Sales], FactSale[Customer Key] = 0 ), [Total Sales] )
+		formatString: 0.0%
+		displayFolder: Customers
+		lineageTag: 9c8c0f29-0807-8257-3b6e-7497a6fb0318
+
+	measure 'Products Sold' = DISTINCTCOUNT ( FactSale[Stock Item Key] )
+		formatString: #,0
+		displayFolder: Products
+		lineageTag: 96600345-5f00-01d2-e7ae-692eb87095e8
+
+	measure 'Loss from Loss-Making Sales' = - CALCULATE ( SUM ( FactSale[Profit] ), FactSale[Profit] < 0 )
+		formatString: \$#,0
+		displayFolder: Profit
+		lineageTag: 90b27e34-77b8-c154-7c69-c88047c76e16
+
+	measure 'Loss-Making Lines' = CALCULATE ( COUNTROWS ( FactSale ), FactSale[Is Loss] = "Yes" )
+		formatString: #,0
+		displayFolder: Profit
+		lineageTag: d4f436db-0c1e-9fa0-dcaf-6aa4dd2e32cb
+
+	measure 'Sales LY' = VAR LastSaleDate = CALCULATE ( MAX ( FactSale[Invoice Date] ), REMOVEFILTERS () ) RETURN CALCULATE ( [Total Sales], DATEADD ( DimDate[Date], -1, YEAR ), DimDate[Date] <= EDATE ( LastSaleDate, -12 ) )
+		formatString: \$#,0
+		displayFolder: Time Intelligence
+		lineageTag: 0086940c-414e-0d67-4b33-ac9e0a248767
+
+	measure 'Sales YoY %' = IF ( HASONEVALUE ( DimDate[Calendar Year] ), DIVIDE ( [Total Sales] - [Sales LY], [Sales LY] ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Time Intelligence
+		lineageTag: 5b19aa25-4dd6-db3c-71de-527b2cf450bf
+
+	column 'Sale Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8b9e0388-c212-930e-054f-573a273b633a
+		summarizeBy: none
+		sourceColumn: Sale Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'WWI Invoice ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: f4697968-5076-7761-9c25-210c7afb5a8a
+		summarizeBy: none
+		sourceColumn: WWI Invoice ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 5a1fd530-9cbe-3974-38c1-3fcec819d608
+		summarizeBy: none
+		sourceColumn: Invoice Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Delivery Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 952f2c63-245c-90ff-b44f-4c5001d584df
+		summarizeBy: none
+		sourceColumn: Delivery Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Delivery Status'
+		dataType: string
+		lineageTag: 5a1e6920-1338-8f55-baff-efc711559e2b
+		summarizeBy: none
+		sourceColumn: Delivery Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'City Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: ba06e146-2e74-c358-714c-f10eb5f0ad08
+		summarizeBy: none
+		sourceColumn: City Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'City ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1ae9e3d5-7afc-6c73-62b4-daa363fd8ddd
+		summarizeBy: none
+		sourceColumn: City ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e8364d4-a5d3-882d-cddb-5b158d66c578
+		summarizeBy: none
+		sourceColumn: Customer Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bill To Customer Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7db10fc4-3741-7b1a-3486-7b21b4733564
+		summarizeBy: none
+		sourceColumn: Bill To Customer Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stock Item Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c75eefb-9f8c-7b4b-a25a-d72c31f4ddf3
+		summarizeBy: none
+		sourceColumn: Stock Item Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Salesperson Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 573f57fa-cf36-8c34-47a8-7651ce5078b1
+		summarizeBy: none
+		sourceColumn: Salesperson Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Salesperson ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 938ac63c-6e7f-653e-f924-a165abbfadfa
+		summarizeBy: none
+		sourceColumn: Salesperson ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 5259b3c7-353c-4a08-b5ef-a344122ae364
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Package
+		dataType: string
+		lineageTag: 60ad30e9-951f-c9ec-be04-2d7d01bfdc01
+		summarizeBy: none
+		sourceColumn: Package
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: #,0
+		lineageTag: b61a4c56-e13a-66d6-e9cc-cf86ec65fd73
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Price'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: ef2270af-4434-b2e6-50e0-e6623ab4869b
+		summarizeBy: none
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'List Unit Price'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d7020e81-e7a5-b446-b3c7-076082518eeb
+		summarizeBy: none
+		sourceColumn: List Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Discount %'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: a12f51fb-49df-cff3-2dde-0fe710aaf325
+		summarizeBy: none
+		sourceColumn: Discount %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Price Type'
+		dataType: string
+		lineageTag: 9ce00cac-039f-dd61-322d-f707f80e2b16
+		summarizeBy: none
+		sourceColumn: Price Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Rate'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a25b7e0-d6ea-8619-6cc4-0d0a5cf2823d
+		summarizeBy: none
+		sourceColumn: Tax Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Excluding Tax'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 0acd1847-c1f0-252d-768e-afdc3154d50c
+		summarizeBy: sum
+		sourceColumn: Total Excluding Tax
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Amount'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d65c9121-810f-c3f1-f54e-f04269a2e333
+		summarizeBy: sum
+		sourceColumn: Tax Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Including Tax'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 9b1e593d-4fc4-4a2e-fed1-03fd7795c695
+		summarizeBy: sum
+		sourceColumn: Total Including Tax
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cost
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 9c311ea1-a19d-85e5-ddc1-c69a7db3db58
+		summarizeBy: sum
+		sourceColumn: Cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 654623a3-6faa-bc27-8a8c-5827ab9824dc
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Line Profit Margin'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 4b592f29-94fb-eb1e-cd39-02d0a9e46d03
+		summarizeBy: none
+		sourceColumn: Profit Margin
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Loss'
+		dataType: string
+		lineageTag: 5880c6e5-c442-e854-f109-9e0dae3779e9
+		summarizeBy: none
+		sourceColumn: Is Loss
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bulk Order'
+		dataType: string
+		lineageTag: 2ac7a18e-f388-3d08-d9d0-7dd4ed44319f
+		summarizeBy: none
+		sourceColumn: Bulk Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Dry Items'
+		dataType: int64
+		formatString: #,0
+		lineageTag: d7b33596-fe7b-21b5-27f4-ddbdd82c8c81
+		summarizeBy: sum
+		sourceColumn: Total Dry Items
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Chiller Items'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 670835df-3977-302b-4eb8-19aad452ee42
+		summarizeBy: sum
+		sourceColumn: Total Chiller Items
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactSale = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FactSale.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"NULL Delivery To Blank" = Table.ReplaceValue(#"Promoted Headers", "NULL", null, Replacer.ReplaceValue, {"Delivery Date Key"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"NULL Delivery To Blank", {{"Sale Key", Int64.Type}, {"City Key", Int64.Type}, {"Customer Key", Int64.Type}, {"Bill To Customer Key", Int64.Type}, {"Stock Item Key", Int64.Type}, {"Invoice Date Key", type date}, {"Delivery Date Key", type date}, {"Salesperson Key", Int64.Type}, {"WWI Invoice ID", Int64.Type}, {"Description", type text}, {"Package", type text}, {"Quantity", Int64.Type}, {"Unit Price", type number}, {"Tax Rate", Int64.Type}, {"Total Excluding Tax", type number}, {"Tax Amount", type number}, {"Profit", type number}, {"Total Including Tax", type number}, {"Total Dry Items", Int64.Type}, {"Total Chiller Items", Int64.Type}}, "en-US"),
+				    #"Removed Lineage Key" = Table.RemoveColumns(#"Changed Type", {"Lineage Key"}),
+				    #"Renamed Dates" = Table.RenameColumns(#"Removed Lineage Key", {{"Invoice Date Key", "Invoice Date"}, {"Delivery Date Key", "Delivery Date"}}),
+				    #"Added Delivery Status" = Table.AddColumn(#"Renamed Dates", "Delivery Status", each if [Delivery Date] = null then "Pending" else "Delivered", type text),
+				    #"Trimmed Descriptions" = Table.TransformColumns(#"Added Delivery Status", {{"Description", CleanSpaces, type text}}),
+				    #"Merged City Map" = Table.NestedJoin(#"Trimmed Descriptions", {"City Key"}, CityKeyMap, {"City Key"}, "City Map", JoinKind.LeftOuter),
+				    #"Added City ID" = Table.ExpandTableColumn(#"Merged City Map", "City Map", {"City ID"}, {"City ID"}),
+				    #"Merged Employee Map" = Table.NestedJoin(#"Added City ID", {"Salesperson Key"}, EmployeeKeyMap, {"Employee Key"}, "Employee Map", JoinKind.LeftOuter),
+				    #"Added Salesperson ID" = Table.ExpandTableColumn(#"Merged Employee Map", "Employee Map", {"Employee ID"}, {"Salesperson ID"}),
+				    #"Merged Product List Price" = Table.NestedJoin(#"Added Salesperson ID", {"Stock Item Key"}, DimStockItem, {"Stock Item Key"}, "Product", JoinKind.LeftOuter),
+				    #"Added List Unit Price" = Table.ExpandTableColumn(#"Merged Product List Price", "Product", {"Unit Price"}, {"List Unit Price"}),
+				    #"Added Discount %" = Table.AddColumn(#"Added List Unit Price", "Discount %", each if [List Unit Price] = null or [List Unit Price] = 0 then 0 else Number.Round(1 - [Unit Price] / [List Unit Price], 4), type number),
+				    #"Added Price Type" = Table.AddColumn(#"Added Discount %", "Price Type", each if [#"Discount %"] > 0 then "Promotional" else "List Price", type text),
+				    #"Added Cost" = Table.AddColumn(#"Added Price Type", "Cost", each Number.Round([Total Excluding Tax] - [Profit], 2), type number),
+				    #"Added Profit Margin" = Table.AddColumn(#"Added Cost", "Profit Margin", each if [Total Excluding Tax] = 0 then null else Number.Round([Profit] / [Total Excluding Tax], 4), type number),
+				    #"Added Is Loss" = Table.AddColumn(#"Added Profit Margin", "Is Loss", each if [Profit] < 0 then "Yes" else "No", type text),
+				    Quartiles = List.Percentile(#"Added Is Loss"[Quantity], {0.25, 0.75}, [PercentileMode = PercentileMode.ExcelInc]),
+				    BulkFence = Quartiles{1} + 1.5 * (Quartiles{1} - Quartiles{0}),
+				    #"Added Bulk Order" = Table.AddColumn(#"Added Is Loss", "Bulk Order", each if [Quantity] > BulkFence then "Yes" else "No", type text),
+				    #"Kept Final Columns" = Table.SelectColumns(#"Added Bulk Order", {"Sale Key", "WWI Invoice ID", "Invoice Date", "Delivery Date", "Delivery Status", "City Key", "City ID", "Customer Key", "Bill To Customer Key", "Stock Item Key", "Salesperson Key", "Salesperson ID", "Description", "Package", "Quantity", "Unit Price", "List Unit Price", "Discount %", "Price Type", "Tax Rate", "Total Excluding Tax", "Tax Amount", "Total Including Tax", "Cost", "Profit", "Profit Margin", "Is Loss", "Bulk Order", "Total Dry Items", "Total Chiller Items"})
+				in
+				    #"Kept Final Columns"
+
+	annotation PBI_ResultType = Table
+
