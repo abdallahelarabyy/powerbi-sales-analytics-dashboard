@@ -4,6 +4,8 @@ An end-to-end sales analytics project on the **Wide World Importers** dataset: d
 
 **Scope:** 26,397 sales lines, Jan 2013 to May 2016, $19.9M sales, $9.9M profit.
 
+![Executive Overview](docs/screenshots/1-overview.png)
+
 ## Skills demonstrated
 
 - **Power Query (M):** cleaning 6 raw source tables (CSV + Excel): type fixing with locale, trimming/whitespace cleanup, de-duplicating cities with key maps, merges, custom columns (cost, discount %, delivery status, product category), and a parameterized data folder
@@ -23,6 +25,20 @@ An end-to-end sales analytics project on the **Wide World Importers** dataset: d
 | **Explore** | Decomposition tree to break total sales down by any dimension |
 | *Tooltip - Month detail* | Hover tooltip with month-level KPIs and sales by category |
 
+## Screenshots
+
+### Trends
+![Sales Trends](docs/screenshots/2-trends.png)
+
+### Products & Profitability
+![Products & Profitability](docs/screenshots/3-products.png)
+
+### Customers, Sales Team & Geography
+![Customers, Sales Team & Geography](docs/screenshots/4-customers.png)
+
+### Explore: What Drives Sales?
+![Decomposition Tree](docs/screenshots/5-explore.png)
+
 ## Key insights
 
 - Sales grew **11% in 2014** and **9% in 2015**, but **Jan-May 2016 is 9.5% below** the same period of 2015.
@@ -40,6 +56,7 @@ An end-to-end sales analytics project on the **Wide World Importers** dataset: d
 | `Power BI Pro/` | The Power BI project (`.pbip`): report definition (PBIR) and semantic model (TMDL), with all Power Query steps and DAX measures as readable text |
 | `Cleaned Data/WWI_Sales_Cleaned.xlsx` | Cleaned star schema with a cleaning log |
 | `Cleaned Data/WWI_Sales_EDA.xlsx` | Exploratory data analysis workbook |
+| `docs/screenshots/` | Report page screenshots |
 
 ## How to open
 
